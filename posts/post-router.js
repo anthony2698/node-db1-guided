@@ -6,15 +6,50 @@ const db = require('../data/db-config.js');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-
+    db.select('*').from('posts')
+        .then(posts => {
+            res.status(200).json({
+                data: posts
+            })
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err.message
+            });
+        });
 });
 
 router.get('/:id', (req, res) => {
-
+    db('posts').where({ id: req.params.id }).first()
+        .then(post => {
+            res.status(200).json({
+                data: post
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err.message
+            });
+        });
 });
 
 router.post('/', (req, res) => {
-
+    db('posts').insert(req.body, "id")
+        .then(ids => {
+            const id = ids[0];
+            
+            db('post').where({ id }).first()
+                .then(post => {
+                    res.status(201).json({
+                        data: post
+                    });
+                });
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err.message
+            });
+        });
 });
 
 router.put('/:id', (req, res) => {

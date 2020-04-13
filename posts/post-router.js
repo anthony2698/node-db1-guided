@@ -37,8 +37,8 @@ router.post('/', (req, res) => {
     db('posts').insert(req.body, "id")
         .then(ids => {
             const id = ids[0];
-            
-            db('post').where({ id }).first()
+
+            db('posts').where({ id }).first()
                 .then(post => {
                     res.status(201).json({
                         data: post
@@ -52,12 +52,35 @@ router.post('/', (req, res) => {
         });
 });
 
-router.put('/:id', (req, res) => {
+router.patch('/:id', (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
 
+    db('posts').where({ id }).update(changes)
+        .then(count => {
+            count > 0
+                ? res.status(200).json({
+                    message: "update successful"
+                })
+                : res.status(404).json({
+                    message: "No post with that ID."
+                });
+        })
 });
 
 router.delete('/:id', (req, res) => {
+    const { id } = req.params;
 
+    db('posts').where({ id }).del()
+        .then(count => {
+            count > 0
+                ? res.status(200).json({
+                    message: "delete successful"
+                })
+                : res.status(404).json({
+                    message: "No post with that ID."
+                });
+        });
 });
 
 module.exports = router;
